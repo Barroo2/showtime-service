@@ -27,6 +27,7 @@ if (!isOpenApiGeneration)
     var db = scope.ServiceProvider.GetRequiredService<ShowtimeDbContext>();
     db.Database.Migrate();
     SeedData.Seed(db);
+    SeedData.RefreshShowtimeDates(db);
 }
 
 app.UseExceptionHandler();

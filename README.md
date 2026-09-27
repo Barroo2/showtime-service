@@ -32,7 +32,7 @@ Alle Zeiten sind UTC.
 
 Der OpenAPI-Contract wird bei jedem Build erzeugt und nach
 [`contracts/showtime-service.v1.json`](contracts/showtime-service.v1.json) kopiert.
-Swagger UI: http://localhost:5188/swagger (nur in Development).
+Swagger UI: http://localhost:5001/swagger (nur in Development).
 
 ## Starten
 
@@ -47,7 +47,7 @@ Voraussetzungen: .NET SDK 10 (x64), Docker.
    dotnet run --project src/ShowtimeService --launch-profile http
    ```
    Beim Start werden die Migrationen angewendet und die Seed-Daten eingefügt (nur wenn noch keine Filme existieren).
-   Der Service läuft auf http://localhost:5188.
+   Der Service läuft auf http://localhost:5001.
 
 Der Connection String steht in `src/ShowtimeService/appsettings.Development.json`
 (`showtime_db`, User `showtime_user`, siehe `init.sql` in `cinema-deploy`).
@@ -72,13 +72,14 @@ dotnet ef migrations add <Name> --project src/ShowtimeService --output-dir Data/
 | Vorstellung | `33333333-3333-3333-3333-000000000003` | Alles steht Kopf 2, Saal 1, morgen 14:00 UTC, 16.00 |
 | Vorstellung | `33333333-3333-3333-3333-000000000004` | Interstellar, Saal 2, morgen 19:00 UTC, 22.00 |
 
-"Heute" und "morgen" beziehen sich auf den Tag, an dem die Datenbank zum ersten Mal befüllt wurde.
-Für frische Termine: Volume in `cinema-deploy` zurücksetzen (`down -v`) und neu starten.
+Liegt beim Start die späteste Vorstellung in der Vergangenheit, werden die 4 Vorstellungen
+auf dieselben Uhrzeiten von heute und morgen (UTC) verschoben. IDs, Filme, Säle und Preise
+bleiben gleich, es werden keine neuen Zeilen angelegt.
 
 ## Beispiel: GET /v1/showtimes/{id}
 
 ```bash
-curl http://localhost:5188/v1/showtimes/33333333-3333-3333-3333-000000000001
+curl http://localhost:5001/v1/showtimes/33333333-3333-3333-3333-000000000001
 ```
 
 ```json

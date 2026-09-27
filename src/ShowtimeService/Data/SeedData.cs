@@ -41,16 +41,44 @@ public static class SeedData
             new Hall { Id = Hall1Id, Name = "Saal 1", RowCount = 5, SeatsPerRow = 10 },
             new Hall { Id = Hall2Id, Name = "Saal 2", RowCount = 8, SeatsPerRow = 12 });
 
-        // Zeiten relativ zum Tag des ersten Starts (UTC)
-        var today = DateTime.UtcNow.Date;
-        var tomorrow = today.AddDays(1);
+        var times = ScheduleFrom(DateTime.UtcNow.Date);
 
         db.Showtimes.AddRange(
-            new Showtime { Id = Showtime1Id, FilmId = FilmInterstellarId, HallId = Hall1Id, StartsAtUtc = today.AddHours(17), BasePrice = 18.50m },
-            new Showtime { Id = Showtime2Id, FilmId = FilmInsideOut2Id, HallId = Hall2Id, StartsAtUtc = today.AddHours(20).AddMinutes(30), BasePrice = 15.00m },
-            new Showtime { Id = Showtime3Id, FilmId = FilmInsideOut2Id, HallId = Hall1Id, StartsAtUtc = tomorrow.AddHours(14), BasePrice = 16.00m },
-            new Showtime { Id = Showtime4Id, FilmId = FilmInterstellarId, HallId = Hall2Id, StartsAtUtc = tomorrow.AddHours(19), BasePrice = 22.00m });
+            new Showtime { Id = Showtime1Id, FilmId = FilmInterstellarId, HallId = Hall1Id, StartsAtUtc = times[Showtime1Id], BasePrice = 18.50m },
+            new Showtime { Id = Showtime2Id, FilmId = FilmInsideOut2Id, HallId = Hall2Id, StartsAtUtc = times[Showtime2Id], BasePrice = 15.00m },
+            new Showtime { Id = Showtime3Id, FilmId = FilmInsideOut2Id, HallId = Hall1Id, StartsAtUtc = times[Showtime3Id], BasePrice = 16.00m },
+            new Showtime { Id = Showtime4Id, FilmId = FilmInterstellarId, HallId = Hall2Id, StartsAtUtc = times[Showtime4Id], BasePrice = 22.00m });
 
         db.SaveChanges();
+    }
+
+    // Liegt die spaeteste Vorstellung in der Vergangenheit, werden die 4 Seed-Vorstellungen
+    // auf dieselben Uhrzeiten von heute und morgen verschoben. Nur StartsAtUtc wird geaendert.
+    public static void RefreshShowtimeDates(ShowtimeDbContext db)
+    {
+        var now = DateTime.UtcNow;
+        var latest = db.Showtimes.Max(s => (DateTime?)s.StartsAtUtc);
+        if (latest is null || latest >= now)
+            return;
+
+        var times = ScheduleFrom(now.Date);
+        var ids = times.Keys.ToList();
+        foreach (var showtime in db.Showtimes.Where(s => ids.Contains(s.Id)))
+            showtime.StartsAtUtc = times[showtime.Id];
+
+        db.SaveChanges();
+    }
+
+    // Seed-Uhrzeiten (UTC): zwei Vorstellungen heute, zwei morgen
+    private static Dictionary<Guid, DateTime> ScheduleFrom(DateTime todayUtc)
+    {
+        var tomorrow = todayUtc.AddDays(1);
+        return new Dictionary<Guid, DateTime>
+        {
+            [Showtime1Id] = todayUtc.AddHours(17),
+            [Showtime2Id] = todayUtc.AddHours(20).AddMinutes(30),
+            [Showtime3Id] = tomorrow.AddHours(14),
+            [Showtime4Id] = tomorrow.AddHours(19),
+        };
     }
 }
