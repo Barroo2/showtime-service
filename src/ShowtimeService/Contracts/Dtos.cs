@@ -22,3 +22,23 @@ public record ShowtimeDetailDto(
     DateTime StartsAtUtc,
     decimal Price,
     IReadOnlyList<string> SeatLabels);
+
+// v2: Der Preis ist ein Objekt mit Betrag und Währung statt einer einzelnen Zahl (Breaking Change)
+public record PriceDto(decimal Amount, string Currency);
+
+public record ShowtimeListItemV2Dto(
+    Guid Id,
+    Guid FilmId,
+    string FilmTitle,
+    Guid HallId,
+    string HallName,
+    DateTime StartsAtUtc,
+    PriceDto Price);
+
+public record ShowtimeDetailV2Dto(
+    Guid Id,
+    ShowtimeFilmDto Film,
+    ShowtimeHallDto Hall,
+    DateTime StartsAtUtc,
+    PriceDto Price,
+    IReadOnlyList<string> SeatLabels);

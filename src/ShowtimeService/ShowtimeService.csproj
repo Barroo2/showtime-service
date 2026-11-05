@@ -30,6 +30,8 @@
   <Target Name="CopyOpenApiContract" AfterTargets="GenerateOpenApiDocuments">
     <Copy SourceFiles="$(OpenApiDocumentsDirectory)/$(MSBuildProjectName).json"
           DestinationFiles="$(MSBuildProjectDirectory)/../../contracts/showtime-service.v1.json" />
+    <Copy SourceFiles="$(OpenApiDocumentsDirectory)/$(MSBuildProjectName)_v2.json"
+          DestinationFiles="$(MSBuildProjectDirectory)/../../contracts/showtime-service.v2.json" />
   </Target>
 
 </Project>

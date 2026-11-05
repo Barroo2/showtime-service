@@ -25,13 +25,18 @@ Der Booking Service ruft `GET /v1/showtimes/{id}` synchron auf, um Preis und gü
 | GET | `/v1/films` | Alle Filme |
 | GET | `/v1/showtimes?date=YYYY-MM-DD` | Vorstellungen eines Tages (UTC), mit Filmtitel und Saalname. Ungültiges Format → 400. Ohne `date`: alle kommenden. |
 | GET | `/v1/showtimes/{id}` | Eine Vorstellung inkl. Film, Saal, Preis und `seatLabels`. Unbekannt → 404 |
+| GET | `/v2/films`, `/v2/showtimes`, `/v2/showtimes/{id}` | Wie v1, aber `price` ist `{ "amount": 18.50, "currency": "CHF" }` |
 | GET | `/health/ready` | 200 nur wenn die Datenbank antwortet, sonst 503 |
+
+`/v1` ist veraltet: Der Contract markiert die Operationen als `deprecated`, Antworten tragen einen `Deprecation`-Header und jeder
+Aufruf wird geloggt (`Veraltete API aufgerufen`). `/v1` wird entfernt, sobald das Log keine Aufrufe mehr zeigt.
 
 Fehler kommen als RFC 7807 ProblemDetails (`application/problem+json`).
 Alle Zeiten sind UTC.
 
-Der OpenAPI-Contract wird bei jedem Build erzeugt und nach
-[`contracts/showtime-service.v1.json`](contracts/showtime-service.v1.json) kopiert.
+Die OpenAPI-Contracts werden bei jedem Build erzeugt und nach
+[`contracts/showtime-service.v1.json`](contracts/showtime-service.v1.json) und
+[`contracts/showtime-service.v2.json`](contracts/showtime-service.v2.json) kopiert.
 Swagger UI: http://localhost:5001/swagger (nur in Development).
 
 ## Starten
